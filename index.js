@@ -65,9 +65,11 @@ const POLLING_SETTINGS = {
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 const bot = new TelegramBot(T_TOKEN, {polling: POLLING_SETTINGS});
-bot.on('message', async (msg) => {
-  const res = await api.sendMessage(msg.text);
+bot.on('message', async ({text, chat: { id }}) => {
+  bot.sendMessage(id, `Думаю над вопросом: ${text}...`);
+  const res = await api.sendMessage(text);
   await sleep(100)
-  bot.sendMessage(msg.chat.id, res.text);
+  bot.sendMessage(id, 'Мой ответ:');
+  bot.sendMessage(id, res.text);
   await sleep(100)
 })
