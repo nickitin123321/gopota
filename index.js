@@ -3,8 +3,9 @@ import 'dotenv/config'
 import { Client, GatewayIntentBits, REST } from 'discord.js';
 import { Routes } from 'discord-api-types/v10';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import TelegramBot from 'node-telegram-bot-api'
 
-const { env: { OPENAI_API_KEY, D_TOKEN, D_CLIENT_ID } } = process;
+const { env: { OPENAI_API_KEY, D_TOKEN, D_CLIENT_ID, T_TOKEN } } = process;
 
 const client = new Client({
   intents: [
@@ -55,3 +56,29 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 client.login(D_TOKEN);
+
+const POLLING_SETTINGS = {
+  interval: 300,
+  autoStart: true
+}
+const bot = new TelegramBot(T_TOKEN, {polling: POLLING_SETTINGS});
+let chatIds = []
+
+bot.onText(/\/start/, async (msg) => {
+  const { chat: { id } } = msg
+  chatIds.push(id)
+
+  bot.sendMessage(id, 'Общайтесь')
+})
+
+bot.onText(/\/stop/, () => {
+  chatIds = []
+  bot.sendMessage(id, 'Очистка всех чатов')
+})
+
+bot.on('message', async (msg) => {
+  const res = await api.sendMessage(msg.text);
+  chatIds.forEach((chatId) => {
+    bot.sendMessage(chatId, res.text);
+  })
+})
