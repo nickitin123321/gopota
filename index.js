@@ -68,6 +68,6 @@ const bot = new TelegramBot(T_TOKEN, {polling: POLLING_SETTINGS});
 bot.on('message', async (msg) => {
   const res = await api.sendMessage(msg.text);
   await sleep(100)
-  bot.sendMessage(msg.chatId, res.text);
+  bot.sendMessage(msg.chat.id, res.text);
   await sleep(100)
 })
