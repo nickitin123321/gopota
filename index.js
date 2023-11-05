@@ -61,24 +61,13 @@ const POLLING_SETTINGS = {
   interval: 300,
   autoStart: true
 }
+
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+
 const bot = new TelegramBot(T_TOKEN, {polling: POLLING_SETTINGS});
-let chatIds = []
-
-bot.onText(/\/start/, async (msg) => {
-  const { chat: { id } } = msg
-  chatIds.push(id)
-
-  bot.sendMessage(id, 'Общайтесь')
-})
-
-bot.onText(/\/stop/, () => {
-  chatIds = []
-  bot.sendMessage(id, 'Очистка всех чатов')
-})
-
 bot.on('message', async (msg) => {
   const res = await api.sendMessage(msg.text);
-  chatIds.forEach((chatId) => {
-    bot.sendMessage(chatId, res.text);
-  })
+  await sleep(100)
+  bot.sendMessage(msg.chatId, res.text);
+  await sleep(100)
 })
